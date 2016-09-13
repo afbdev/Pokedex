@@ -15,8 +15,20 @@ class PokeCell: UICollectionViewCell {
     
     var pokemon: Pokemon!
     
+    
+    //
+    /* override init(frame: CGRect){
+        super.init(frame: frame)
+    }
+    */
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        // Rounding corners of cell
+        layer.cornerRadius = 10.0
+    }
+    
+    
     func configureCell(pokemon: Pokemon) {
-        
         self.pokemon = pokemon
         
         nameLabel.text = self.pokemon.name.capitalizedString
