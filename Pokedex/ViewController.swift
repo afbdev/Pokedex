@@ -29,7 +29,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         searchBar.delegate = self
         
         // Change 'Search' to 'Done' in keyboard
-        searchBar.returnKeyType = UIReturnKeyType.Done
+        searchBar.returnKeyType = UIReturnKeyType.done
         
         // Call function when app loads
         initAudio()
@@ -45,10 +45,10 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     func initAudio() {
         
-        let path = NSBundle.mainBundle().pathForResource("music", ofType: "mp3")!
+        let path = Bundle.main.path(forResource: "music", ofType: "mp3")!
         
         do {
-            musicPlayer = try AVAudioPlayer(contentsOfURL: NSURL(string: path)!)
+            musicPlayer = try AVAudioPlayer(contentsOf: URL(string: path)!)
             musicPlayer.prepareToPlay()
             musicPlayer.numberOfLoops = -1
             musicPlayer.play()
@@ -60,9 +60,9 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     // Changed sender to 'UIButton' to call for alpha settings
     
-    @IBAction func musicButtonPressed(sender: UIButton!) {
+    @IBAction func musicButtonPressed(_ sender: UIButton!) {
         
-        if musicPlayer.playing {
+        if musicPlayer.isPlaying {
             musicPlayer.stop()
             sender.alpha = 0.2
             
@@ -79,7 +79,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     func parsePokemonCSV() {
         
         // Create path to file
-        let path = NSBundle.mainBundle().pathForResource("pokemon", ofType: "csv")!
+        let path = Bundle.main.path(forResource: "pokemon", ofType: "csv")!
         
         // Parsing file
         do {
@@ -104,18 +104,18 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     
     // COLLECTION VIEW METHODS
 
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         // Setup cell, similar to TableView
         // Need to add cell reuse identifier("PokeCell"), similar to prototype cell
-        if let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PokeCell", forIndexPath: indexPath) as? PokeCell {
+        if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PokeCell", for: indexPath) as? PokeCell {
             
             // Grab pokemon from data array
             let poke: Pokemon!
             if inSearchMode {
-                poke = filteredPokemon[indexPath.row]
+                poke = filteredPokemon[(indexPath as NSIndexPath).row]
             } else {
-                poke = pokemon[indexPath.row]
+                poke = pokemon[(indexPath as NSIndexPath).row]
             }
             
             // Configure cells with pokemon from data array
@@ -127,31 +127,31 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         }
         
     }
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         let poke: Pokemon!
         
         if inSearchMode {
-            poke = filteredPokemon[indexPath.row]
+            poke = filteredPokemon[(indexPath as NSIndexPath).row]
         } else {
-            poke = pokemon[indexPath.row]
+            poke = pokemon[(indexPath as NSIndexPath).row]
         }
         
-        performSegueWithIdentifier("PokemonDetailsVC", sender: poke)
+        performSegue(withIdentifier: "PokemonDetailsVC", sender: poke)
     }
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if inSearchMode {
             return filteredPokemon.count
         }
         return pokemon.count
     }
-    func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         // size of grid
         
-        return CGSizeMake(105, 105)
+        return CGSize(width: 105, height: 105)
     }
     
 
@@ -160,7 +160,7 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
     // Created filteredArray and inSearchMode boolean above
     // '$0' is on video 10,118 at 9:00
     
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         if searchBar.text == nil || searchBar.text == "" {
             inSearchMode = false
@@ -169,22 +169,22 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
             collection.reloadData()
         } else {
             inSearchMode = true
-            let lower = searchBar.text!.lowercaseString
-            filteredPokemon = pokemon.filter({$0.name.rangeOfString(lower) != nil})
+            let lower = searchBar.text!.lowercased()
+            filteredPokemon = pokemon.filter({$0.name.range(of: lower) != nil})
             
             collection.reloadData()
         }
     }
     
-    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // Hide keyboard when search button is pressed
         view.endEditing(true)
     }
     
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "PokemonDetailsVC" {
-            if let detailsVC = segue.destinationViewController as? PokemonDetailsVC {
+            if let detailsVC = segue.destination as? PokemonDetailsVC {
                 if let poke = sender as? Pokemon {
                     detailsVC.pokemon = poke
                 }
